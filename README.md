@@ -1,6 +1,6 @@
 ## Introduction
 
-Python's can quickly and easily aggregrate data from multiple sheets from multiple Excel workbooks into a single data frame. A custom function combining functions from the `Pandas` package provides a template that can be adapted and expanded to handle many different data specific needs. 
+Python can quickly and easily aggregrate data from multiple sheets from multiple Excel workbooks into a single data frame. A custom function combining functions from the `Pandas` package provides a template that can be adapted and expanded to handle many different data specific needs. 
 
 This exercise is also done using [R's Tidyverse](https://github.com/sbha/readdir_xl).
 
@@ -136,6 +136,23 @@ df_xl = dir_xl_reader(dir_path, file_pattern)
 ```
 
 The modifications with this example might seem trivial and something that can be done seperately after the data has been aggregrated, which they can, of course, but they quickly become useful when dealing with a large number of files that might get near a machine's memory limits or as part of a process that will be repeated. 
+
+Finally, if the files aren't `.xlsx`, a similar method can be used for `.csv` or other delimited files using functions from the Pandas library:
+
+```
+def dir_reader(d, f):
+    df_out = pd.DataFrame()
+    for file in glob.glob(os.path.join(d, f)):
+        df = pd.read_csv(file)
+        df['file'] = file
+        df['file'] = df['file'].str.replace(d, '')
+        df_out = df_out.append(df, ignore_index=True)
+    return(df_out)
+
+file_type = "test[0-9].csv"    
+df = dir_reader(dir_path, file_type)
+
+```
 
 
 ### Summary

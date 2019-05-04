@@ -71,3 +71,18 @@ df_xl.head()
 
 
 df_xl.groupby(['file_name', 'sheet_name']).size()
+
+
+# with CSV files
+def dir_reader(d, f):
+    df_out = pd.DataFrame()
+    for file in glob.glob(os.path.join(d, f)):
+        df = pd.read_csv(file)
+        df['file'] = file
+        df['file'] = df['file'].str.replace(d, '')
+        df_out = df_out.append(df, ignore_index=True)
+    return(df_out)
+
+file_type = "test[0-9].csv"    
+df = dir_reader(dir_path, file_type)
+

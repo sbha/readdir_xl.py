@@ -1,6 +1,6 @@
 ## Introduction
 
-Python can quickly and easily aggregrate data from multiple sheets from multiple Excel workbooks into a single data frame. A custom function combining functions from the `Pandas` package provides a template that can be adapted and expanded to handle many different data specific needs. 
+Python can quickly and easily aggregrate data from multiple Excel workbooks with multiple sheets into a single data frame. A custom function combining functions from the `Pandas` package provides a template that can be adapted and expanded to handle many different data specific needs. 
 
 This exercise is also done using [R's Tidyverse](https://github.com/sbha/readdir_xl).
 
@@ -8,7 +8,7 @@ This exercise is also done using [R's Tidyverse](https://github.com/sbha/readdir
 
 Import the packages that have the functions that do all the heavy lifting:
 
-```
+```python
 import pandas as pd
 import os
 import glob 
@@ -17,11 +17,11 @@ import re
 
 Define the target directory as a variable. This is the path to the directory where the Excel files are stored:
 
-`dir_path <- "~/path/to/test_dir/"`  
+`dir_path = "~/path/to/test_dir/"`  
 
 In this example all the Excel files we're interested in have the same naming convention, so we can use a matching pattern to ensure we're reading only the files we need. This is useful if there are files in the same directory that we don't want to read. In this case the files are named `sample_2019-01-09.xlsx`, `sample_2019-01-15.xlsx` and so on, but we could simply use `xlsx` if we knew we needed every Excel file, or leave that arguement empty if we knew the directory contained only Excel files. The pattern can be defined as a variable:
 
-`file_pattern <- "^sample_*.xlsx" `   
+`file_pattern = "^sample_*.xlsx" `   
 
 This pattern will match file names that begin with `sample_` and end with the file extension `.xlsx`. You can check that this matches all the files you're expecting with:
 
@@ -29,7 +29,7 @@ This pattern will match file names that begin with `sample_` and end with the fi
 
 Next we can write the custom function that will read the individual Excel files and combine the different sheets within each workbook into a single data frame. The two function inputs will be the path to the files, which was defined earlier with `dir_path` and then the file name pattern `file_pattern`. The function will loop through the files in the directory that match the file name pattern, get the individual sheet neames from each file with `pd.ExcelFile(file_name).sheet_names`, then import the data from each sheet with `pd.read_excel(file_name, sheet)`. The file names and sheet names are added as columns, and along with the column `cat` are moved to the leftmost columns to improve readability of the data frame:
 
-```
+```python
 def dir_xl_reader(d, f):
     df = pd.DataFrame()
     for file_name in glob.glob(os.path.join(d, f)):
@@ -48,7 +48,7 @@ def dir_xl_reader(d, f):
 
 With the custom function `dir_xl_reader()` defined, we can now use it to aggregate all the sheets from all the individual files matching `file_pattern` in the directory into a single data frame:
 
-```
+```python
 df_xl = dir_xl_reader(dir_path, file_pattern)
 >>> df_xl.head()
                 file_name sheet_name cat  Col 1  Col 2  Col 3  Col 4
@@ -61,7 +61,7 @@ df_xl = dir_xl_reader(dir_path, file_pattern)
 
 To get a better sense of everything in the data frame, we can use `df_xl.groupby(['file_name', 'sheet_name']).size()` to see the number of observations by file and sheet name:
 
-```
+```python
 >>> df_xl.groupby(['file_name', 'sheet_name']).size()
 file_name               sheet_name
 sample_2019-01-09.xlsx  Sheet1        12
@@ -79,7 +79,7 @@ In this example, not every file has the same sheets or columns. The files need n
 
 This custom function aggregates every file, but we can improve the output by extending the function to handle more specific needs of this data. For our example, the column names can be reformatted so that they are always in a more `Python` friendly format. In the modified function below, all column names are converted to lower case and spaces are replaced with a single underscores:
 
-```
+```python
 def dir_xl_reader(d, f):
     df = pd.DataFrame()
     for file_name in glob.glob(os.path.join(d, f)):
@@ -100,7 +100,7 @@ def dir_xl_reader(d, f):
 
 Going further, if the original Excel files contains data you don't need, you could remove it by filtering or by dropping specific columns. Or a column could be created using with something like the following:
 
-```
+```python
 def dir_xl_reader(d, f):
     df = pd.DataFrame()
     for file_name in glob.glob(os.path.join(d, f)):
@@ -124,7 +124,7 @@ def dir_xl_reader(d, f):
 
 In this expanding function, we're removing any rows where column `cat` equals `b`, dropping column `col_3`, and then creating a new column that adds columns `col_1` and `col_2`. Running the same Excel files through the updated custom function gives us a different data frame, more specific to our needs:
 
-```
+```python
 df_xl = dir_xl_reader(dir_path, file_pattern)
 >>> df_xl.head()
                  file_name sheet_name cat  col_1  col_2  col_4  col_1_plus_col_2
@@ -135,11 +135,12 @@ df_xl = dir_xl_reader(dir_path, file_pattern)
 10  sample_2019-02-02.xlsx     Sheet1   c    4.0    5.0    NaN               9.0
 ```
 
+
 The modifications with this example might seem trivial and something that can be done seperately after the data has been aggregrated, which they can, of course, but they quickly become useful when dealing with a large number of files that might get near a machine's memory limits or as part of a process that will be repeated. 
 
 Finally, if the files aren't `.xlsx`, a similar method can be used for `.csv` or other delimited files using functions from the Pandas library:
 
-```
+```python
 def dir_reader(d, f):
     df_out = pd.DataFrame()
     for file in glob.glob(os.path.join(d, f)):
